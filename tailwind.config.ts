@@ -8,9 +8,17 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        allura: ['Allura',"serif"],
+        playfair: ['"Playfair Display"', 'serif'],
+        vibes: ['"Great Vibes"', 'cursive'],
+      },
+     
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        customGreen: '#001C17',
+        
       },
     },
   },
