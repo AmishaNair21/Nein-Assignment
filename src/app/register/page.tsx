@@ -6,6 +6,8 @@ import Link from "next/link";
 import { z } from "zod";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Eye } from "lucide-react";
+import { EyeOff } from "lucide-react";
 
 const registerSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -16,6 +18,7 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -30,9 +33,18 @@ const Register = () => {
     setLoading(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      toast.success("Account created successfully!");
-      router.push("/login");
+    const response = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers:{
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to register');
+    }
+    toast.success("Account created successfully!");
+    router.push('/login');
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error("Something went wrong, please try again!");
@@ -89,16 +101,29 @@ const Register = () => {
             >
               Password
             </label>
-            <div className="px-5">
+            <div className="px-5  relative">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 id="password"
                 name="password"
-                className="mt-2 w-full p-2 border border-yellow-700 bg-customGreen rounded-md focus:bg-customGreen focus:text-yellow-500 focus:border-gray-500"
+                className="mt-2 w-full p-2 border border-yellow-700 bg-customGreen rounded-md focus:bg-customGreen
+                focus:text-yellow-500 focus:border-gray-500"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-10 top-[60%] transform -translate-y-1/2 text-yellow-500 hover:text-yellow-600"
+                tabIndex={-1}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
             </div>
           </div>
           <div className="mt-9 flex justify-center">
