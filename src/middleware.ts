@@ -5,17 +5,27 @@ import jwt from 'jsonwebtoken';
 export function middleware(request: NextRequest) {
   const token = request.cookies.get('token');
 
-  // Check if the route requires authentication
+  // Add console.log for debugging
+  console.log('Token:', token);
+  console.log('Path:', request.nextUrl.pathname);
+
   if (request.nextUrl.pathname.startsWith('/bookings')) {
     if (!token) {
+      console.log('No token found');
       return NextResponse.redirect(new URL('/login', request.url));
     }
 
     try {
-      jwt.verify(token.value, process.env.JWT_SECRET as string);
+      // Add more detailed error handling
+      if (!process.env.JWT_SECRET) {
+        console.error('JWT_SECRET is not defined');
+        return NextResponse.redirect(new URL('/login', request.url));
+      }
+
+      jwt.verify(token.value, process.env.JWT_SECRET);
       return NextResponse.next();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
+      console.error('JWT verification failed:', error);
       return NextResponse.redirect(new URL('/login', request.url));
     }
   }
@@ -24,5 +34,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: '/bookings/:path*'
+  matcher: ['/bookings/:path*', '/api/bookings/:path*']
 };
