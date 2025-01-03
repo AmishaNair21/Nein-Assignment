@@ -41,14 +41,21 @@ const Login = () => {
       });
 
       const data = await response.json();
-      if(data.error){
+      
+      if (data.error) {
         toast.error(data.error);
         return;
       }
+
+      // Wait a brief moment to ensure cookie is set
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       toast.success("Login successful!");
       router.push("/bookings");
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // Force a page refresh to ensure middleware picks up the new cookie
+      router.refresh();
     } catch (error) {
+      console.error('Login error:', error);
       toast.error("Something went wrong, please try again!");
     } finally {
       setLoading(false);
